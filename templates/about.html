@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCapture - About</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <div class="logo">Smile<span>Capture</span></div>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('capture') }}">Capture Smiles</a></li>
+                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                    <li><a href="{{ url_for('about') }}" class="active">About</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="page-header">
+                <h1>About SmileCapture</h1>
+                <p>This is an Open Source App which captures Smiles of Users.</p>
+            </div>
+            </section>
+        </main>
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SmileCapture</h3>
+                    <p>Capturing happiness, one smile at a time.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>
+                        <a href="https://github.com/Shahid6174/Smile" target="_blank" style="text-decoration: none; display: inline-flex; align-items: center;">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" 
+                            alt="GitHub" width="24" height="24" style="margin-right: 8px;">View GitHub Repo
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 SmileCapture. All rights reserved by Github.</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
