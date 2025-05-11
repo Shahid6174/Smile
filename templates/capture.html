@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCapture - Capture Smiles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <div class="logo">Smile<span>Capture</span></div>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('capture') }}" class="active">Capture Smiles</a></li>
+                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                    <li><a href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="page-header">
+                <h1>Capture Your Smiles</h1>
+                <p>Position your face in the frame and smile naturally to capture your best expressions</p>
+            </div>
+
+            <div class="app-container">
+                <div class="camera-section">
+                    <div class="video-container">
+                        <img src="{{ url_for('video_feed') }}" width="640" height="480">
+                        <div class="overlay">
+                            <div class="face-guide"></div>
+                            <div id="smile-indicator" class="smile-indicator">
+                                <div class="smile-progress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-container">
+                        <div id="status-message" class="status-message">Getting ready...</div>
+                        <div id="capture-progress" class="capture-progress">
+                            <span>Photos: </span>
+                            <div class="progress-dots">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <button id="start-btn" class="btn primary-btn">Start Camera</button>
+                    <button id="show-images-btn" class="btn secondary-btn" disabled>Show Captured Images</button>
+                    <button id="done-btn" class="btn secondary-btn">New Session</button>
+                </div>
+
+                <div class="session-info">
+                    <p>Your session code: <span id="session-code">{{ folder_code }}</span></p>
+                    <p class="help-text">Keep this code to access your photos later</p>
+                </div>
+            </div>
+
+            <div id="gallery" class="gallery-container hidden">
+                <h2>Your Captured Smiles</h2>
+                <div id="images-container" class="images-grid"></div>
+                <div class="gallery-controls">
+                    <button id="back-btn" class="btn secondary-btn">Back to Camera</button>
+                    <button id="download-all" class="btn primary-btn">Download All</button>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <h3>How it works</h3>
+                <ol>
+                    <li>Click "Start Camera" and allow camera access</li>
+                    <li>Position your face in the frame and smile naturally</li>
+                    <li>The app will automatically capture when you smile</li>
+                    <li>Click "Show Captured Images" to view your photos</li>
+                    <li>Save your session code to access photos later</li>
+                </ol>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SmileCapture</h3>
+                    <p>Capturing happiness, one smile at a time.</p>
+                </div>
+                <div class="footer-section">
+                    
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@smilecapture.com</p>
+                    <p>Phone: (123) 456-7890</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SmileCapture. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

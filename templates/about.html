@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCapture - About</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <div class="logo">Smile<span>Capture</span></div>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('capture') }}">Capture Smiles</a></li>
+                    <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                    <li><a href="{{ url_for('about') }}" class="active">About</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="page-header">
+                <h1>About SmileCapture</h1>
+                <p>This is an Open Source App which captures Smiles of Users.</p>
+            </div>
+            </section>
+        </main>
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SmileCapture</h3>
+                    <p>Capturing happiness, one smile at a time.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('capture') }}">Capture</a></li>
+                        <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                        <li><a href="{{ url_for('about') }}">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@smilecapture.com</p>
+                    <p>Phone: (123) 456-7890</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SmileCapture. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

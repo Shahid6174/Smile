@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileCapture - Gallery</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="main-nav">
+                <div class="logo">Smile<span>Capture</span></div>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('capture') }}">Capture Smiles</a></li>
+                    <li><a href="{{ url_for('gallery') }}" class="active">Gallery</a></li>
+                    <li><a href="{{ url_for('about') }}">About</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="page-header">
+                <h1>Your Smile Gallery</h1>
+                <p>Enter your session code to view your captured smiles</p>
+            </div>
+
+            <div class="gallery-search">
+                <div class="search-container">
+                    <input type="text" id="session-code-input" placeholder="Enter your 6-digit session code" maxlength="6">
+                    <button id="search-btn" class="btn primary-btn">Find My Photos</button>
+                </div>
+            </div>
+
+            <div id="gallery-results" class="gallery-container">
+                <h2>Your Captured Smiles</h2>
+                <div id="gallery-images" class="images-grid">
+                    <!-- Images will be loaded here -->
+                    <div class="no-images">Enter your session code to view your photos</div>
+                </div>
+                <div class="gallery-controls">
+                    <button id="download-all-gallery" class="btn primary-btn" disabled>Download All</button>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>SmileCapture</h3>
+                    <p>Capturing happiness, one smile at a time.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('capture') }}">Capture</a></li>
+                        <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+                        <li><a href="{{ url_for('about') }}">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@smilecapture.com</p>
+                    <p>Phone: (123) 456-7890</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 SmileCapture. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/gallery.js') }}"></script>
+</body>
+</html>
