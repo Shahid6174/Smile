@@ -68,6 +68,14 @@
         .captured-images img:hover {
             transform: scale(1.1);
         }
+        .download-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
         .button-container {
             display: flex;
             justify-content: center;
@@ -97,6 +105,12 @@
             color: #ff5733;
             font-weight: bold;
         }
+        .final-message {
+            font-size: 20px;
+            color: #ff5733;
+            font-weight: bold;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -110,9 +124,12 @@
             <button onclick="smoothReload()">Done</button>
         </div>
         <div class="captured-images" id="capturedImages"></div>
+        
+        <!-- The "Download Your Moments" message will appear here -->
+        <div class="final-message" id="finalMessage"></div>
     </div>
     <h2>Your Code is: <span class="code-highlight">{{ folder_code }}</span></h2>
-    
+
     <script>
         function loadCapturedImages() {
             fetch('/get_images')
@@ -120,13 +137,38 @@
                 .then(data => {
                     let imageContainer = document.getElementById('capturedImages');
                     imageContainer.innerHTML = ''; // Clear previous images
+
                     data.images.forEach(image => {
+                        let imgWrapper = document.createElement('div');
+                        imgWrapper.style.position = 'relative'; // Ensure download icon is positioned correctly
+
                         let imgElement = document.createElement('img');
                         imgElement.src = "/static/images/" + image;
-                        imgElement.style.opacity = "0"; 
-                        imageContainer.appendChild(imgElement);
-                        setTimeout(() => { imgElement.style.opacity = "1"; }, 100); // Fade-in effect
+                        imgWrapper.appendChild(imgElement);
+
+                        // Create a download icon on the top-right corner of the image
+                        let downloadIcon = document.createElement('div');
+                        downloadIcon.classList.add('download-icon');
+                        downloadIcon.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="24" height="24">
+                                <path d="M12 16.5l-6-6h4V3h4v7h4l-6 6z"/>
+                            </svg>
+                        `;
+                        downloadIcon.onclick = function() {
+                            let link = document.createElement('a');
+                            link.href = "/static/images/" + image;
+                            link.download = image;  // Set the file name for download
+                            link.click();  // Trigger the download
+                        };
+
+                        imgWrapper.appendChild(downloadIcon);
+                        imageContainer.appendChild(imgWrapper);
                     });
+
+                    // Show final download message below the images
+                    let finalMessage = document.getElementById('finalMessage');
+                    finalMessage.innerHTML = "The Smile You Captured is Just a Click Away! Download Now! 😄";
+                    
                     setTimeout(() => {
                         window.scrollTo({
                             top: document.body.scrollHeight,
