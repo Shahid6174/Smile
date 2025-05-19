@@ -103,7 +103,8 @@
     <h1>😊 Smile to Capture Your Photo! 😊</h1>
     <div class="container">
         <div class="video-container">
-            <img src="{{ url_for('video_feed') }}" width="640" height="480">
+            <video id="video" width="640" height="480" autoplay playsinline></video>
+            <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
         </div>
         <div class="button-container">
             <button onclick="loadCapturedImages()">Show Captured Images</button>
@@ -114,6 +115,47 @@
     <h2>Your Code is: <span class="code-highlight">{{ folder_code }}</span></h2>
     
     <script>
+        // Camera setup
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        let capturing = true;
+        let imagesCaptured = 0;
+        const totalImages = 3; // Should match server
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    captureLoop();
+                };
+            } catch (err) {
+                alert('Camera access denied or not available.');
+            }
+        }
+
+        function captureLoop() {
+            if (!capturing || imagesCaptured >= totalImages) return;
+            // Draw video frame to canvas
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            // Convert to data URL
+            const dataURL = canvas.toDataURL('image/jpeg');
+            // Send to backend
+            fetch('/process_frame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: dataURL })
+            })
+            .then(res => res.json())
+            .then(data => {
+                imagesCaptured = data.images_captured;
+                if (imagesCaptured < totalImages) {
+                    setTimeout(captureLoop, 300); // Try again after 300ms
+                }
+            });
+        }
+
         function loadCapturedImages() {
             fetch('/get_images')
                 .then(response => response.json())
@@ -142,6 +184,8 @@
                 location.reload();
             }, 500); // Wait for fade-out before reloading
         }
+
+        window.onload = startCamera;
     </script>
 </body>
 </html>
