@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Smile</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    
+    .container {
+      text-align: center;
+    }
+    
+    .face {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background-color: #ffde59;
+      margin: 0 auto 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+    
+    .face:hover {
+      transform: scale(1.1);
+    }
+    
+    .eyes {
+      position: relative;
+      top: 60px;
+      display: flex;
+      justify-content: space-around;
+      width: 150px;
+      margin: 0 auto;
+    }
+    
+    .eye {
+      width: 30px;
+      height: 30px;
+      background-color: #222;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+    
+    .face:hover .eye {
+      height: 5px;
+      margin-top: 12px;
+      border-radius: 5px;
+    }
+    
+    .mouth {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 50px;
+      border-bottom-left-radius: 100px;
+      border-bottom-right-radius: 100px;
+      background-color: #222;
+      transition: all 0.3s ease;
+    }
+    
+    .face:hover .mouth {
+      height: 60px;
+      width: 120px;
+    }
+    
+    .controls {
+      margin-top: 20px;
+    }
+    
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #45a049;
+    }
+    
+    .color-buttons {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      gap: 10px;
+    }
+    
+    .color-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+    
+    .message {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      min-height: 27px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Interactive Smile</h1>
+    <div class="face" id="face">
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
+      </div>
+      <div class="mouth"></div>
+    </div>
+    
+    <div class="controls">
+      <button id="animate">Animate</button>
+      <button id="reset">Reset</button>
+      
+      <div class="color-buttons">
+        <div class="color-button" style="background-color: #ffde59;" data-color="#ffde59"></div>
+        <div class="color-button" style="background-color: #ff9f43;" data-color="#ff9f43"></div>
+        <div class="color-button" style="background-color: #ff6b6b;" data-color="#ff6b6b"></div>
+        <div class="color-button" style="background-color: #48dbfb;" data-color="#48dbfb"></div>
+        <div class="color-button" style="background-color: #1dd1a1;" data-color="#1dd1a1"></div>
+      </div>
+    </div>
+    
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const face = document.getElementById('face');
+      const animateBtn = document.getElementById('animate');
+      const resetBtn = document.getElementById('reset');
+      const colorButtons = document.querySelectorAll('.color-button');
+      const messageEl = document.getElementById('message');
+      const messages = [
+        "Have a great day!",
+        "Keep smiling!",
+        "You're awesome!",
+        "Stay positive!",
+        "Spread happiness!"
+      ];
+      
+      let isAnimating = false;
+      let animationInterval;
+      
+      // Hover simulation for animation
+      animateBtn.addEventListener('click', () => {
+        if (isAnimating) return;
+        
+        isAnimating = true;
+        messageEl.textContent = messages[Math.floor(Math.random() * messages.length)];
+        
+        face.classList.add('hover-effect');
+        face.style.transform = 'scale(1.1)';
+        
+        const eyes = face.querySelectorAll('.eye');
+        eyes.forEach(eye => {
+          eye.style.height = '5px';
+          eye.style.marginTop = '12px';
+          eye.style.borderRadius = '5px';
+        });
+        
+        const mouth = face.querySelector('.mouth');
+        mouth.style.height = '60px';
+        mouth.style.width = '120px';
+        
+        // Bounce animation
+        let bounceUp = true;
+        let scale = 1.1;
+        animationInterval = setInterval(() => {
+          if (bounceUp) {
+            scale += 0.01;
+            if (scale >= 1.15) bounceUp = false;
+          } else {
+            scale -= 0.01;
+            if (scale <= 1.05) bounceUp = true;
+          }
+          face.style.transform = `scale(${scale})`;
+        }, 50);
+      });
+      
+      // Reset animation
+      resetBtn.addEventListener('click', () => {
+        if (!isAnimating) return;
+        
+        clearInterval(animationInterval);
+        isAnimating = false;
+        messageEl.textContent = '';
+        
+        face.style.transform = '';
+        
+        const eyes = face.querySelectorAll('.eye');
+        eyes.forEach(eye => {
+          eye.style.height = '';
+          eye.style.marginTop = '';
+          eye.style.borderRadius = '';
+        });
+        
+        const mouth = face.querySelector('.mouth');
+        mouth.style.height = '';
+        mouth.style.width = '';
+      });
+      
+      // Color change functionality
+      colorButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          face.style.backgroundColor = button.getAttribute('data-color');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
