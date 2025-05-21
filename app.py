@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import cv2
 import os
 import time
 import random
 import base64
 import numpy as np
+import zipfile
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -124,6 +126,27 @@ def process_frame():
 @app.route('/get_images')
 def get_images():
     return jsonify({"images": [f"{folder_code}/image_{i+1}.jpg" for i in range(images_captured)]})
+
+@app.route('/download_images')
+def download_images():
+    global folder_code, folder_path, images_captured
+    try:
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(zip_buffer, 'w') as zipf:
+            for i in range(images_captured):
+                img_filename = f"image_{i+1}.jpg"
+                img_path = os.path.join(folder_path, img_filename)
+                if os.path.exists(img_path):
+                    zipf.write(img_path, arcname=img_filename)
+        zip_buffer.seek(0)
+        return send_file(
+            zip_buffer,
+            mimetype='application/zip',
+            as_attachment=True,
+            download_name=f"{folder_code}_images.zip"
+        )
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/gallery')
 def gallery():

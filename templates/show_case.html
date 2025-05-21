@@ -39,6 +39,21 @@
         border: 2px solid #ff5733;
         background: #eee;
       }
+      .download-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 15px;
+        font-size: 1em;
+        color: #fff;
+        background: #ff5733;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .download-btn:hover {
+        background: #e04527;
+      }
     </style>
   </head>
   <body>
@@ -51,6 +66,8 @@
         <img src="{{ img }}" alt="Smile Image" />
         {% endfor %}
       </div>
+      <a href="/static/images/{{ entry.id }}.zip" id="download-{{ entry.id }}" class="download-btn" style="display:none;">Download ZIP</a>
+      <button onclick="window.location.href='/download_images?id={{ entry.id }}'">Download Images as ZIP</button>
     </div>
     {% else %}
     <p>No images found.</p>
