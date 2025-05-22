@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Smile Gallery</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #ff5733;
+      }
+      .gallery-section {
+        background: #fff;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .id-label {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
+      .images-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .images-row img {
+        width: 160px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #ff5733;
+        background: #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Smile Gallery</h1>
+    {% for entry in gallery %}
+    <div class="gallery-section">
+      <div class="id-label">ID: {{ entry.id }}</div>
+      <div class="images-row">
+        {% for img in entry.images %}
+        <img src="{{ img }}" alt="Smile Image" />
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <p>No images found.</p>
+    {% endfor %}
+  </body>
+</html>
