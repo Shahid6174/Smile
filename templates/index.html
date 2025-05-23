@@ -3,19 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smile Capture 😊</title>
+    <title>Smile Capture 📸</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body {
-        font-family: "Poppins", sans-serif;
-        text-align: center;
-        background: linear-gradient(to right, #ff9a9e, #fad0c4);
+        font-family: "Inter", sans-serif;
+        /* Reverted to photobooth curtain background */
+        background: url('{{ url_for("static", filename="images/bg2.png") }}') center center / cover no-repeat fixed;
+        background-size: cover, 10px 10px; /* Cover for gradient, small for stripes */
+        background-blend-mode: multiply; /* Blend the gradient and stripes */
+        background-attachment: fixed; /* Keep background fixed */
+
         margin: 0;
-        padding: 20px;
-        color: #333;
+        padding: 0;
+        color: #333; /* Default text color, overridden by specific elements */
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
         opacity: 0;
         animation: fadeIn 1s forwards;
       }
@@ -39,162 +47,115 @@
           transform: translateY(-10px);
         }
       }
-      h1 {
-        color: #fff;
-        font-weight: 600;
-        margin-bottom: 20px;
+      /* Custom styles for sleek design */
+      .header-gradient {
+        /* Changed header gradient to black */
+        background: linear-gradient(to right, #000000, #333333);
       }
-      .container {
-        background: white;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        display: inline-block;
-        max-width: 700px;
-        width: 100%;
-        transition: transform 0.3s;
-        opacity: 0;
-        animation: fadeIn 1s forwards 0.5s;
+      .footer-gradient {
+        /* Changed footer gradient to black */
+        background: linear-gradient(to right, #333333, #000000);
       }
-      .container:hover {
-        transform: scale(1.02);
+      .container-bg {
+        background: rgba(255, 255, 255, 0.9); /* Slightly transparent white */
       }
-      .video-container {
-        border: 6px solid #ff5733;
-        border-radius: 12px;
-        overflow: hidden;
+      .video-border {
+        /* Changed video border to black */
+        border: 6px solid #000000;
       }
-      .button-container {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 15px;
+      .button-primary {
+        /* Changed button primary color to black */
+        background: #000000;
       }
-      button {
-        background: #ff5733;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        font-size: 18px;
-        cursor: pointer;
-        border-radius: 6px;
-        transition: background 0.3s, transform 0.2s;
-      }
-      button:hover {
-        background: #e74c3c;
+      .button-primary:hover {
+        /* Changed button hover color to a darker grey */
+        background: #333333;
         transform: scale(1.05);
       }
-      .status-message {
-        margin-top: 15px;
-        font-size: 16px;
-        color: #333;
+      .progress-bar-inner {
+        background: #32cd32; /* Lime green */
+      }
+      .smile-bar-inner {
+        background: #ffd700; /* Gold */
+      }
+      .captured-image-border {
+        /* Changed captured image border to black */
+        border: 3px solid #000000;
       }
       .alert-message {
         display: none;
-        margin-top: 10px;
-      }
-      .progress-container {
-        margin-top: 20px;
-        text-align: left;
-      }
-      .progress-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        margin-bottom: 4px;
-        color: #555;
-      }
-      .progress-bar {
-        width: 100%;
-        height: 12px;
-        background: #e0e0e0;
-        border-radius: 6px;
-        overflow: hidden;
-        margin-bottom: 12px;
-      }
-      .progress-bar-inner {
-        height: 100%;
-        width: 0;
-        background: #4caf50;
-        transition: width 0.3s;
-      }
-      .smile-bar-inner {
-        height: 100%;
-        width: 0;
-        background: #ffa500;
-        transition: width 0.3s;
-      }
-      .captured-images {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-      .captured-images img {
-        width: 120px;
-        height: 120px;
-        margin: 8px;
-        border-radius: 10px;
-        border: 3px solid #ff5733;
-        transition: transform 0.3s, opacity 0.3s;
-        opacity: 0;
-        animation: fadeIn 0.5s forwards;
-      }
-      .captured-images img:hover {
-        transform: scale(1.1);
-      }
-      h2 {
-        margin-top: 20px;
-        font-size: 22px;
+        background-color: #4CAF50; /* Green */
         color: white;
-      }
-      .code-highlight {
-        color: #ff5733;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
         font-weight: bold;
+      }
+      .status-message {
+        color: #555;
       }
     </style>
   </head>
-  <body>
-    <h1>😊 Smile to Capture Your Photo! 😊</h1>
-    <div class="container">
-      <div id="status-message" class="status-message">
-        Initializing camera...
+  <body class="flex flex-col min-h-screen">
+    <header class="header-gradient text-white p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-3xl font-bold">📸 Smile Capture Booth</h1>
+        <nav>
+          <a href="/gallery" class="text-white hover:text-gray-200 text-lg font-semibold transition duration-300">Gallery</a>
+        </nav>
       </div>
-      <div id="alert-message" class="alert-message"></div>
+    </header>
 
-      <div class="video-container">
-        <video id="video" width="640" height="480" autoplay playsinline></video>
-        <canvas
-          id="canvas"
-          width="640"
-          height="480"
-          style="display: none"
-        ></canvas>
+    <main class="flex-grow flex items-center justify-center p-4">
+      <div class="container-bg p-8 rounded-xl shadow-2xl inline-block max-w-2xl w-full transition-transform duration-300 hover:scale-102">
+        <div id="status-message" class="status-message text-lg mb-4">
+          Initializing camera...
+        </div>
+        <div id="alert-message" class="alert-message"></div>
+
+        <div class="video-container video-border rounded-xl overflow-hidden mb-6">
+          <video id="video" width="640" height="480" autoplay playsinline class="w-full h-auto rounded-xl"></video>
+          <canvas
+            id="canvas"
+            width="640"
+            height="480"
+            style="display: none"
+          ></canvas>
+        </div>
+
+        <div class="progress-container mb-6">
+          <div class="progress-labels flex justify-between text-sm mb-1 text-gray-700">
+            <span>Images Captured</span><span id="progress-text">0/3</span>
+          </div>
+          <div class="progress-bar w-full h-3 bg-gray-200 rounded-full overflow-hidden mb-4">
+            <div id="progress-bar" class="progress-bar-inner h-full w-0 rounded-full transition-all duration-300"></div>
+          </div>
+          <div class="progress-labels flex justify-between text-sm mb-1 text-gray-700">
+            <span>Smile Streak</span><span id="smile-text">0/3</span>
+          </div>
+          <div class="progress-bar w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div id="smile-progress" class="smile-bar-inner h-full w-0 rounded-full transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <div class="button-container flex justify-center gap-4 mb-6">
+          <button onclick="loadCapturedImages()" class="button-primary text-white py-3 px-6 rounded-lg text-lg font-semibold shadow-md transition duration-300">
+            Show Captured Images
+          </button>
+          <button onclick="smoothReload()" class="button-primary text-white py-3 px-6 rounded-lg text-lg font-semibold shadow-md transition duration-300">
+            New Session
+          </button>
+        </div>
+
+        <div class="captured-images flex justify-center flex-wrap gap-4" id="capturedImages"></div>
+        <h2 class="text-xl font-semibold text-gray-800 mt-6">Your Session ID: <span class="text-blue-700 font-bold">{{ folder_code }}</span></h2>
       </div>
+    </main>
 
-      <div class="progress-container">
-        <div class="progress-labels">
-          <span>Images Captured</span><span id="progress-text">0/3</span>
-        </div>
-        <div class="progress-bar">
-          <div id="progress-bar" class="progress-bar-inner"></div>
-        </div>
-        <div class="progress-labels">
-          <span>Smile Streak</span><span id="smile-text">0/3</span>
-        </div>
-        <div class="progress-bar">
-          <div id="smile-progress" class="smile-bar-inner"></div>
-        </div>
-      </div>
-
-      <div class="button-container">
-        <button onclick="loadCapturedImages()">Show Captured Images</button>
-        <button onclick="smoothReload()">Done</button>
-      </div>
-
-      <div class="captured-images" id="capturedImages"></div>
-    </div>
-    <h2>Your Code is: <span class="code-highlight">{{ folder_code }}</span></h2>
+    <footer class="footer-gradient text-white p-4 text-center shadow-inner mt-auto">
+      <p>&copy; 2025 Smile Capture Booth. All rights reserved.</p>
+      <p class="text-sm">Made with ❤️ for your perfect smile.</p>
+    </footer>
 
     <script>
       const video = document.getElementById("video");
@@ -202,6 +163,10 @@
       let capturing = true;
       let imagesCaptured = 0;
       const totalImages = 3;
+      const consecutiveSmileFrames = 3; // From Python backend, hardcoded for JS
+      let currentSmileStreak = 0; // Managed client-side for progress bar immediate update
+
+      // Removed background image variables and changeBackground function
 
       async function startCamera() {
         try {
@@ -213,8 +178,10 @@
             video.play();
             captureLoop();
           };
+          updateStatus("Camera ready. Smile to capture!");
         } catch (err) {
-          updateStatus("Camera access denied or not available.", true);
+          updateStatus("Camera access denied or not available. Please allow camera access.", true);
+          console.error("Error accessing camera:", err);
         }
       }
 
@@ -223,7 +190,7 @@
         const alertEl = document.getElementById("alert-message");
         if (statusEl) statusEl.textContent = message;
         if (isAlert && alertEl) {
-          alertEl.textContent = "📸 SMILE CAPTURED! 😊";
+          alertEl.textContent = "📸 SMILE CAPTURED! ✨";
           alertEl.style.display = "block";
           setTimeout(() => (alertEl.style.display = "none"), 3000);
         }
@@ -265,7 +232,7 @@
           .then((res) => res.json())
           .then((data) => {
             imagesCaptured = data.images_captured;
-            updateStatus(data.message, false);
+            currentSmileStreak = data.smile_streak; // Update client-side streak from server
             updateProgressBar(
               imagesCaptured,
               totalImages,
@@ -275,6 +242,8 @@
             if (data.alert) {
               updateStatus(data.message, true);
               if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            } else {
+              updateStatus(data.message); // Update status message
             }
             if (imagesCaptured < totalImages) {
               setTimeout(captureLoop, 100);
@@ -295,9 +264,14 @@
           .then((data) => {
             const container = document.getElementById("capturedImages");
             container.innerHTML = "";
+            if (data.images.length === 0) {
+                container.innerHTML = '<div class="text-gray-600 text-center py-4">No images captured yet.</div>';
+                return;
+            }
             data.images.forEach((img) => {
               const el = document.createElement("img");
               el.src = "/static/images/" + img;
+              el.classList.add("w-32", "h-32", "object-cover", "rounded-lg", "shadow-md", "transition-transform", "duration-300", "opacity-0", "captured-image-border");
               container.appendChild(el);
               setTimeout(() => (el.style.opacity = "1"), 100);
             });
@@ -317,7 +291,7 @@
         setTimeout(() => location.reload(), 500);
       }
 
-      window.onload = startCamera;
+      window.onload = startCamera; /* Removed background setting from onload */
     </script>
   </body>
 </html>
