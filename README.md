@@ -102,7 +102,9 @@ smile-capture/
 ├── static/
 │   └── images/
 ├── templates/
-│   └── index.html
+│   ├──index.html
+│   ├──gallery.html
+│   └──show_case.html
 ├── app.py
 ├── requirements.txt
 └── README.md
