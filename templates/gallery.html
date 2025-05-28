@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smile Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header class="header">
+        <div class="brand">Smile</div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/gallery">Gallery</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <h1>Your Smile Gallery</h1>
+
+        {% if gallery %}
+        <div class="gallery-grid">
+            {% for entry in gallery %}
+            <div class="gallery-card">
+                <div class="gallery-id">ID: {{ entry.id }}</div>
+                <div class="gallery-images-row">
+                    {% for img in entry.images %}
+                    <img src="{{ img }}" alt="Smile Image" />
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No captured smile sessions found yet.</p>
+            <p>Start a new session on the <a href="/" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Home page</a>!</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Smile. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
