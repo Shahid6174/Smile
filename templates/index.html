@@ -147,8 +147,15 @@
           </button>
         </div>
 
-        <div class="captured-images flex justify-center flex-wrap gap-4" id="capturedImages"></div>
-        <h2 class="text-xl font-semibold text-gray-800 mt-6">Your Session ID: <span class="text-blue-700 font-bold">{{ folder_code }}</span></h2>
+
+
+      <div class="button-container">
+        <button onclick="loadCapturedImages()">Show Captured Images</button>
+        <button onclick="smoothReload()">Done</button>
+        <a href="/download_images" style="text-decoration:none;">
+          <button type="button">Download All Images as ZIP</button>
+        </a>
+
       </div>
     </main>
 
