@@ -236,6 +236,9 @@ def gallery():
 # For this simple example, it's fine here, but ensure they are correctly managed.
 # The @app.route('/') effectively initializes them on each page load.
 if __name__ == '__main__':
+
     # Ensure the base static/images directory exists
     os.makedirs("static/images", exist_ok=True)
-    app.run(debug=True)
+
+    app.run(debug=True, host="0.0.0.0", port=5000)
+
