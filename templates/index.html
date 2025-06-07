@@ -139,8 +139,8 @@
         </div>
 
         <div class="button-container flex justify-center gap-4 mb-6">
-          <button href="gallery.html" class="button-primary text-white py-3 px-6 rounded-lg text-lg font-semibold shadow-md transition duration-300">
-            Show Captured Images
+          <button id="changeBackgroundBtn" class="button-primary text-white py-3 px-6 rounded-lg text-lg font-semibold shadow-md transition duration-300">
+            Switch background
           </button>
           <button onclick="smoothReload()" class="button-primary text-white py-3 px-6 rounded-lg text-lg font-semibold shadow-md transition duration-300">
             New Session
@@ -299,6 +299,39 @@
       }
 
       window.onload = startCamera; /* Removed background setting from onload */
+    </script>
+    <script>
+        const changeBackgroundBtn = document.getElementById('changeBackgroundBtn');
+        const body = document.body;
+        const totalBackgrounds = 9; // Number of background images (bg1.png to bg9.png)
+        let currentBgIndex = 1; // Start with bg1.png
+
+        // Function to get a random integer between min and max (inclusive)
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        changeBackgroundBtn.addEventListener('click', function() {
+            // Option 1: Random background
+            const newBgIndex = getRandomInt(1, totalBackgrounds);
+
+            // Option 2: Sequential background (uncomment to use this instead of random)
+            // currentBgIndex++;
+            // if (currentBgIndex > totalBackgrounds) {
+            //     currentBgIndex = 1; // Loop back to the first background
+            // }
+            // const newBgIndex = currentBgIndex;
+
+            // Construct the path to the new background image
+            const imagePath = `/static/images/bg${newBgIndex}.png`;
+            
+            // Apply the new background image to the body
+            body.style.backgroundImage = `url("${imagePath}")`;
+        });
+
+
     </script>
   </body>
 </html>
