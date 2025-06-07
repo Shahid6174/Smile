@@ -1,22 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smile Gallery</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  </head>
-  <body>
-    <header class="header">
-        <div class="brand">Smile</div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /*
+        * You can optionally keep some gallery-specific CSS here,
+        * but ideally, move all shared styles to static/style.css
+        */
+
+        /* Ensure main content takes available space and is centered */
+        .main-content-gallery {
+            background: url('{{ url_for("static", filename="images/bg2.png") }}') center center / cover no-repeat fixed;;
+            flex-grow: 1; /* Allows main content to take available space */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            padding: 2rem; /* Add some padding */
+            color: #000000; /* Light text color for better contrast on background */
+        }
+
+        .main-content-gallery h1 {
+            font-size: 2.5em; /* Larger heading */
+            color: rgb(255, 255, 255); /* Make heading stand out */
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7); /* Text shadow for readability */
+            text-align: center; /* Center the title */
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+            gap: 1.5rem; /* Space between gallery cards */
+            max-width: 1200px; /* Max width for the grid */
+            width: 100%; /* Take full width within max-width */
+            margin-top: 1.5rem;
+        }
+
+        .gallery-card {
+            background: rgba(0, 0, 0, 0.95); /* Slightly less transparent white than container-bg */
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Stronger shadow for cards */
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+            overflow: hidden; /* Ensure rounded corners */
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-8px); /* Lift card on hover */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4); /* Stronger shadow on hover */
+        }
+
+        .gallery-id {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .gallery-images-row {
+            display: flex;
+            gap: 10px; /* Space between images in a row */
+            flex-wrap: wrap; /* Allow images to wrap if too many */
+            justify-content: center; /* Center images if they wrap */
+        }
+
+        .gallery-images-row img {
+            width: 120px; /* Fixed width for consistency */
+            height: 120px; /* Fixed height for consistency */
+            object-fit: cover; /* Crop images to fit */
+            border-radius: 8px;
+            border: 2px solid #ccc; /* Light border around images */
+            transition: transform 0.2s ease;
+        }
+
+        .gallery-images-row img:hover {
+            transform: scale(1.05); /* Slight zoom on image hover */
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: #555;
+            font-size: 1.1em;
+            margin-top: 2rem;
+        }
+
+        .empty-state a {
+            color: #007bff !important; /* Force primary color */
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .empty-state a:hover {
+            text-decoration: underline;
+        }
+        header, footer {
+            background: linear-gradient(135deg, #4a90e2, #9013fe); /* Gradient for header and footer */
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header class="header-gradient text-white p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="text-3xl font-bold">📸 Smile</div>
         <nav>
-            <a href="/">Home</a>
-            <a href="/gallery">Gallery</a>
+          <a href="/" class="text-white hover:text-gray-200 text-lg font-semibold transition duration-300 mr-4">Home</a>
+          <a href="/gallery" class="text-white hover:text-gray-200 text-lg font-semibold transition duration-300">Gallery</a>
         </nav>
+      </div>
     </header>
 
-    <main class="main-content">
+    <main class="main-content-gallery">
         <h1>Your Smile Gallery</h1>
 
         {% if gallery %}
@@ -35,13 +140,15 @@
         {% else %}
         <div class="empty-state">
             <p>No captured smile sessions found yet.</p>
-            <p>Start a new session on the <a href="/" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">Home page</a>!</p>
+            <p>Start a new session on the <a href="/">Home page</a>!</p>
         </div>
         {% endif %}
     </main>
 
-    <footer class="footer">
-        <p>&copy; 2025 Smile. All rights reserved.</p>
+    <footer class="footer-gradient text-white p-4 text-center shadow-inner mt-auto">
+      <p>&copy; 2025 Smile Capture Booth. All rights reserved.</p>
+      <p class="text-sm">Made with ❤️ for your perfect smile.</p>
     </footer>
-  </body>
+
+</body>
 </html>
