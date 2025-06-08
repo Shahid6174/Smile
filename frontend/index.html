@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smile Capture 📸</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: #f8f9fa;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #212529;
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .video-container {
+      max-width: 640px;
+      margin: 1rem auto;
+      border: 4px solid #212529;
+      border-radius: 1rem;
+      overflow: hidden;
+    }
+    video {
+      display: block;
+      width: 100%;
+      border-radius: 1rem;
+    }
+    #capturedImages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+    #capturedImages img {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+      border: 2px solid #212529;
+    }
+    footer {
+      background-color: #212529;
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: auto;
+      box-shadow: inset 0 1px 5px rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+  <header class="text-center">
+    <h1 class="mb-0">📸 Smile Capture Booth</h1>
+  </header>
+
+  <main class="flex-grow-1 d-flex flex-column align-items-center py-4">
+    <div class="video-container">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    </div>
+
+    <div class="d-flex gap-3 mt-3 flex-wrap justify-content-center">
+      <button id="capture-btn" class="btn btn-primary btn-lg">Capture Photo</button>
+      <button id="show-images-btn" class="btn btn-dark btn-lg">Show Captured Images</button>
+      <button id="new-session-btn" class="btn btn-dark btn-lg">New Session</button>
+      <button id="download-zip-btn" class="btn btn-outline-dark btn-lg">Download ZIP</button>
+    </div>
+
+    <div id="capturedImages"></div>
+  </main>
+
+  <footer>
+    <p class="mb-1">&copy; 2025 Smile Capture Booth. All rights reserved.</p>
+    <p class="small">Made with ❤️ for your perfect smile.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('capture-btn');
+    const showImagesBtn = document.getElementById('show-images-btn');
+    const newSessionBtn = document.getElementById('new-session-btn');
+    const downloadZipBtn = document.getElementById('download-zip-btn');
+    const capturedImagesContainer = document.getElementById('capturedImages');
+
+    let capturedImages = [];
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        await video.play();
+      } catch {
+        alert('Could not access the camera. Please allow camera access or try a different device.');
+      }
+    }
+
+    captureBtn.addEventListener('click', () => {
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/jpeg');
+      capturedImages.push(dataURL);
+      displayCapturedImages();
+    });
+
+    showImagesBtn.addEventListener('click', () => {
+      if (capturedImages.length === 0) {
+        alert('No images captured yet.');
+      } else {
+        displayCapturedImages();
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    });
+
+    newSessionBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to start a new session? All captured images will be lost.')) {
+        capturedImages = [];
+        capturedImagesContainer.innerHTML = '';
+      }
+    });
+
+    downloadZipBtn.addEventListener('click', () => {
+      alert('Download ZIP functionality requires backend support and is not implemented in this demo.');
+    });
+
+    function displayCapturedImages() {
+      capturedImagesContainer.innerHTML = '';
+      capturedImages.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        capturedImagesContainer.appendChild(img);
+      });
+    }
+
+    window.onload = startCamera;
+  </script>
+</body>
+</html>
