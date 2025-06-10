@@ -7,42 +7,25 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
-      background: #f8f9fa;
+      background: black;
+      
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
-    header {
-      background-color: #212529;
-      color: white;
-      padding: 1rem 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    }
     .video-container {
       max-width: 640px;
-      margin: 1rem auto;
+      margin: 0 auto;
       border: 4px solid #212529;
       border-radius: 1rem;
       overflow: hidden;
     }
-    video {
-      display: block;
-      width: 100%;
-      border-radius: 1rem;
+    .fade-out {
+      animation: fadeOut 0.5s forwards;
     }
-    #capturedImages {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-      margin-top: 1rem;
-    }
-    #capturedImages img {
-      width: 120px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 0.5rem;
-      border: 2px solid #212529;
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
     }
     footer {
       background-color: #212529;
@@ -55,24 +38,49 @@
   </style>
 </head>
 <body>
-  <header class="text-center">
-    <h1 class="mb-0">📸 Smile Capture Booth</h1>
+  <header class="bg-dark text-white p-3 shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <h1 class="h3 mb-0">📸 Smile Capture Booth</h1>
+      <nav>
+        <a href="/gallery" class="text-white text-decoration-none fs-5">Gallery</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="flex-grow-1 d-flex flex-column align-items-center py-4">
-    <div class="video-container">
-      <video id="video" autoplay playsinline></video>
-      <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
-    </div>
+  <main class="flex-grow-1 d-flex justify-content-center align-items-center py-4">
+    <div class="bg-white bg-opacity-90 rounded-4 shadow-lg p-4 max-w-800 w-100">
+      <div id="status-message" class="mb-3 fs-5 text-secondary">Initializing camera...</div>
+      <div id="alert-message" class="alert alert-success d-none">📸 SMILE CAPTURED! ✨</div>
 
-    <div class="d-flex gap-3 mt-3 flex-wrap justify-content-center">
-      <button id="capture-btn" class="btn btn-primary btn-lg">Capture Photo</button>
-      <button id="show-images-btn" class="btn btn-dark btn-lg">Show Captured Images</button>
-      <button id="new-session-btn" class="btn btn-dark btn-lg">New Session</button>
-      <button id="download-zip-btn" class="btn btn-outline-dark btn-lg">Download ZIP</button>
-    </div>
+      <div class="video-container mb-4">
+        <video id="video" autoplay playsinline class="w-100 rounded-4"></video>
+        <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+      </div>
 
-    <div id="capturedImages"></div>
+      <div class="mb-4">
+        <div class="d-flex justify-content-between small text-secondary mb-1">
+          <span>Images Captured</span><span id="progress-text">0/3</span>
+        </div>
+        <div class="progress mb-3" style="height: 12px;">
+          <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%;"></div>
+        </div>
+
+        <div class="d-flex justify-content-between small text-secondary mb-1">
+          <span>Smile Streak</span><span id="smile-text">0/3</span>
+        </div>
+        <div class="progress" style="height: 12px;">
+          <div id="smile-progress" class="progress-bar bg-warning" role="progressbar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-center gap-3 mb-3">
+        <button id="show-images-btn" class="btn btn-dark btn-lg">Show Captured Images</button>
+        <button id="new-session-btn" class="btn btn-dark btn-lg">New Session</button>
+        <a href="/download_images" class="btn btn-outline-dark btn-lg">Download ZIP</a>
+      </div>
+
+      <div id="capturedImages" class="d-flex flex-wrap gap-3 justify-content-center"></div>
+    </div>
   </main>
 
   <footer>
@@ -82,62 +90,106 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const captureBtn = document.getElementById('capture-btn');
-    const showImagesBtn = document.getElementById('show-images-btn');
-    const newSessionBtn = document.getElementById('new-session-btn');
-    const downloadZipBtn = document.getElementById('download-zip-btn');
-    const capturedImagesContainer = document.getElementById('capturedImages');
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const statusMessage = document.getElementById("status-message");
+    const alertMessage = document.getElementById("alert-message");
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+    const smileProgress = document.getElementById("smile-progress");
+    const smileText = document.getElementById("smile-text");
+    const capturedImagesContainer = document.getElementById("capturedImages");
+    const showImagesBtn = document.getElementById("show-images-btn");
+    const newSessionBtn = document.getElementById("new-session-btn");
 
-    let capturedImages = [];
+    let imagesCaptured = 0;
+    const totalImages = 3;
+
+    function updateStatus(message, showAlert = false) {
+      statusMessage.textContent = message;
+      if (showAlert) {
+        alertMessage.classList.remove("d-none");
+        setTimeout(() => alertMessage.classList.add("d-none"), 2000);
+      }
+    }
+
+    function updateProgress(imagesCount, smileCount, smileNeeded) {
+      progressBar.style.width = (imagesCount / totalImages) * 100 + "%";
+      progressText.textContent = `${imagesCount}/${totalImages}`;
+
+      smileProgress.style.width = (smileCount / smileNeeded) * 100 + "%";
+      smileText.textContent = `${smileCount}/${smileNeeded}`;
+    }
 
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-        await video.play();
+        video.onloadedmetadata = () => video.play();
+        updateStatus("Camera ready. Smile to capture!");
+        captureLoop();
       } catch {
-        alert('Could not access the camera. Please allow camera access or try a different device.');
+        updateStatus("Camera access denied.");
       }
     }
 
-    captureBtn.addEventListener('click', () => {
-      const ctx = canvas.getContext('2d');
+    function captureLoop() {
+      if (imagesCaptured >= totalImages) {
+        updateStatus("All images captured! Check gallery.");
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataURL = canvas.toDataURL('image/jpeg');
-      capturedImages.push(dataURL);
-      displayCapturedImages();
-    });
+      const frame = canvas.toDataURL("image/jpeg");
 
-    showImagesBtn.addEventListener('click', () => {
-      if (capturedImages.length === 0) {
-        alert('No images captured yet.');
-      } else {
-        displayCapturedImages();
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-      }
-    });
-
-    newSessionBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to start a new session? All captured images will be lost.')) {
-        capturedImages = [];
-        capturedImagesContainer.innerHTML = '';
-      }
-    });
-
-    downloadZipBtn.addEventListener('click', () => {
-      alert('Download ZIP functionality requires backend support and is not implemented in this demo.');
-    });
-
-    function displayCapturedImages() {
-      capturedImagesContainer.innerHTML = '';
-      capturedImages.forEach(src => {
-        const img = document.createElement('img');
-        img.src = src;
-        capturedImagesContainer.appendChild(img);
+      fetch("/process_frame", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: frame })
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        imagesCaptured = data.images_captured || imagesCaptured;
+        updateProgress(imagesCaptured, data.smile_streak || 0, data.required_streak || 3);
+        if (data.alert) updateStatus(data.message, true);
+        else updateStatus(data.message);
+        if (imagesCaptured < totalImages) setTimeout(captureLoop, 300);
+      })
+      .catch(() => {
+        updateStatus("Frame processing error.");
+        setTimeout(captureLoop, 1000);
       });
     }
+
+    function loadCapturedImages() {
+      fetch("/get_images")
+        .then((res) => res.json())
+        .then((data) => {
+          capturedImagesContainer.innerHTML = "";
+          if (!data.images.length) {
+            capturedImagesContainer.innerHTML = `<p class="text-muted">No images captured yet.</p>`;
+            return;
+          }
+          data.images.forEach((img) => {
+            const image = document.createElement("img");
+            image.src = "/static/images/" + img;
+            image.className = "img-thumbnail rounded m-1";
+            image.style.width = "120px";
+            image.style.height = "90px";
+            capturedImagesContainer.appendChild(image);
+          });
+          setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 300);
+        });
+    }
+
+    function reloadPage() {
+      document.body.classList.add("fade-out");
+      setTimeout(() => location.reload(), 500);
+    }
+
+    showImagesBtn.addEventListener("click", loadCapturedImages);
+    newSessionBtn.addEventListener("click", reloadPage);
 
     window.onload = startCamera;
   </script>
