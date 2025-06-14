@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smile Capture 📸</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #000000, #111111, #1a1a1a);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 1s ease-out;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    header, footer {
+      background: linear-gradient(to right, #0f0f0f, #1e1e1e);
+      padding: 1rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid #ff00ff44;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      color: #ff00ff;
+      text-shadow: 0 0 5px #ff00ffaa;
+    }
+
+    nav a {
+      margin-left: 1.5rem;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    nav a:hover {
+      color: #ff00ff;
+      text-shadow: 0 0 5px #ff00ff88;
+    }
+
+    main {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid #ffffff22;
+      padding: 2rem;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 0 20px #ff00ff33;
+      transition: transform 0.3s;
+    }
+
+    .glass-card:hover {
+      transform: scale(1.02);
+    }
+
+    .video-container video {
+      width: 100%;
+      border-radius: 1rem;
+      border: 4px solid #ff00ff44;
+    }
+
+    .progress-wrapper {
+      margin: 1.5rem 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .progress-bar {
+      background: #333;
+      border-radius: 10px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .progress-green { background: #00ff99; }
+    .progress-yellow { background: #ffd700; }
+
+    .btn-glow {
+      background: #000;
+      border: 2px solid #ff00ff;
+      color: #ff00ff;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 5px #ff00ff66;
+      box-shadow: 0 0 10px #ff00ff33;
+    }
+
+    .btn-glow:hover {
+      background: #ff00ff;
+      color: #000;
+      box-shadow: 0 0 15px #ff00ff;
+    }
+
+    #capturedImages {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    #capturedImages img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 2px solid #ff00ff;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
+    }
+
+    #capturedImages img:hover {
+      transform: scale(1.1);
+    }
+
+    footer {
+      font-size: 0.9rem;
+      border-top: 1px solid #444;
+      margin-top: auto;
+      color: #888;
+    }
+
+    canvas { display: none; }
+
+    /* Background switcher styles */
+    .background-selector {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .bg-thumbnails, .gradient-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .bg-thumb, .gradient-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid #ff00ff55;
+      transition: transform 0.2s ease;
+    }
+
+    .bg-thumb:hover, .gradient-btn:hover {
+      transform: scale(1.1);
+      border-color: #ff00ff;
+    }
+
+    .gradient-btn {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📸 Smile Capture Booth</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/gallery">Gallery</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="glass-card">
+      <div id="status-message">Initializing camera...</div>
+      <div id="alert-message" class="alert d-none">📸 Smile Captured!</div>
+
+      <div class="video-container mt-3">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+      </div>
+
+      <div class="progress-wrapper">
+        <div class="progress-label"><span>Images Captured</span><span id="progress-text">0/3</span></div>
+        <div class="progress-bar"><div id="progress-bar" class="progress-fill progress-green" style="width: 0%"></div></div>
+
+        <div class="progress-label mt-3"><span>Smile Streak</span><span id="smile-text">0/3</span></div>
+        <div class="progress-bar"><div id="smile-progress" class="progress-fill progress-yellow" style="width: 0%"></div></div>
+      </div>
+
+      <div class="d-flex gap-3 justify-content-center mt-4">
+        <button class="btn-glow" onclick="loadCapturedImages()">Show Captured</button>
+        <button class="btn-glow" onclick="smoothReload()">New Session</button>
+        <a href="/download_images" class="btn-glow">Download ZIP</a>
+      </div>
+
+      <div id="capturedImages"></div>
+
+      <!-- Background Selector -->
+      <div class="background-selector">
+        <h3>Change Background</h3>
+        <div class="bg-thumbnails">
+               <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg1.png');" onclick="document.body.style.background='url(/Smile/static/images/bg1.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+      <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg2.png');" onclick="document.body.style.background='url(/Smile/static/images/bg2.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+      <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg3.png');" onclick="document.body.style.background='url(/Smile/static/images/bg3.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+      <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg4.png');" onclick="document.body.style.background='url(/Smile/static/images/bg4.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+      <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg5.png');" onclick="document.body.style.background='url(/Smile/static/images/bg5.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+      <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg6.png');" onclick="document.body.style.background='url(/Smile/static/images/bg6.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+      <div class="bg-thumb" style="background-image: url('/Smile/static/images/bg7.png');" onclick="document.body.style.background='url(/Smile/static/images/bg7.png) no-repeat center center fixed';document.body.style.backgroundSize='cover';"></div>
+        </div>
+
+        <div class="gradient-buttons">
+          <div class="gradient-btn" style="background: linear-gradient(135deg, #ff9a9e, #fad0c4);" onclick="setGradientBg('linear-gradient(135deg, #ff9a9e, #fad0c4)')"></div>
+          <div class="gradient-btn" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb);" onclick="setGradientBg('linear-gradient(135deg, #a18cd1, #fbc2eb)')"></div>
+          <div class="gradient-btn" style="background: linear-gradient(135deg, #89f7fe, #66a6ff);" onclick="setGradientBg('linear-gradient(135deg, #89f7fe, #66a6ff)')"></div>
+          <div class="gradient-btn" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);" onclick="setGradientBg('linear-gradient(135deg, #ffecd2, #fcb69f)')"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Smile Capture Booth — Made with ❤️ and neon dreams.</p>
+  </footer>
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    let imagesCaptured = 0;
+    let smileStreak = 0;
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+          captureLoop();
+        };
+        updateStatus("Camera ready. Smile to capture!");
+      } catch (err) {
+        updateStatus("Unable to access camera.");
+        console.error(err);
+      }
+    }
+
+    function updateStatus(msg) {
+      document.getElementById("status-message").textContent = msg;
+    }
+
+    function updateProgress(captured, streak) {
+      document.getElementById("progress-text").textContent = `${captured}/3`;
+      document.getElementById("progress-bar").style.width = `${(captured / 3) * 100}%`;
+
+      document.getElementById("smile-text").textContent = `${streak}/3`;
+      document.getElementById("smile-progress").style.width = `${(streak / 3) * 100}%`;
+    }
+
+    function captureLoop() {
+      if (imagesCaptured >= 3) {
+        updateStatus("All images captured!");
+        return;
+      }
+
+      canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL("image/jpeg");
+
+      fetch("/process_frame", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: imageData }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          imagesCaptured = data.images_captured;
+          smileStreak = data.smile_streak;
+          updateProgress(imagesCaptured, smileStreak);
+          updateStatus(data.message);
+          if (data.alert) {
+            document.getElementById("alert-message").classList.remove("d-none");
+            setTimeout(() => document.getElementById("alert-message").classList.add("d-none"), 3000);
+          }
+          setTimeout(captureLoop, 200);
+        })
+        .catch(err => {
+          console.error(err);
+          updateStatus("Error processing frame.");
+          setTimeout(captureLoop, 1000);
+        });
+    }
+
+    function loadCapturedImages() {
+      fetch("/get_images")
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById("capturedImages");
+          container.innerHTML = "";
+          if (!data.images.length) return;
+          data.images.forEach(img => {
+            const el = document.createElement("img");
+            el.src = "/static/images/" + img;
+            container.appendChild(el);
+          });
+        });
+    }
+
+    function smoothReload() {
+      document.body.style.opacity = "0";
+      setTimeout(() => location.reload(), 500);
+    }
+
+    function setBgImage(imageName) {
+      document.body.style.background = `url('/static/images/${imageName}') no-repeat center center fixed`;
+      document.body.style.backgroundSize = 'cover';
+    }
+
+    function setGradientBg(gradient) {
+      document.body.style.background = gradient;
+      document.body.style.backgroundAttachment = 'fixed';
+    }
+
+    window.onload = startCamera;
+  </script>
+</body>
+</html>
