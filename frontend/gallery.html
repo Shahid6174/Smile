@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gallery 📷</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #000000, #1a1a1a, #111111);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 1s ease-out;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    header, footer {
+      background: linear-gradient(to right, #0f0f0f, #1e1e1e);
+      padding: 1rem 2rem;
+      text-align: center;
+      border-bottom: 2px solid #ff00ff44;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      color: #ff00ff;
+      text-shadow: 0 0 5px #ff00ffaa;
+    }
+
+    nav a {
+      margin-left: 1.5rem;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    nav a:hover {
+      color: #ff00ff;
+      text-shadow: 0 0 5px #ff00ff88;
+    }
+
+    main {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      border: 1px solid #ffffff22;
+      padding: 2rem;
+      width: 100%;
+      max-width: 900px;
+      box-shadow: 0 0 20px #ff00ff33;
+      transition: transform 0.3s;
+    }
+
+    .glass-card:hover {
+      transform: scale(1.01);
+    }
+
+    .gallery-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .gallery-grid img {
+      width: 160px;
+      height: 160px;
+      object-fit: cover;
+      border: 3px solid #ff00ff55;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-grid img:hover {
+      transform: scale(1.1);
+      border-color: #ff00ff;
+      box-shadow: 0 0 10px #ff00ff77;
+    }
+
+    .btn-glow {
+      background: #000;
+      border: 2px solid #ff00ff;
+      color: #ff00ff;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 5px #ff00ff66;
+      box-shadow: 0 0 10px #ff00ff33;
+      margin-top: 1rem;
+      display: inline-block;
+    }
+
+    .btn-glow:hover {
+      background: #ff00ff;
+      color: #000;
+      box-shadow: 0 0 15px #ff00ff;
+    }
+
+    footer {
+      font-size: 0.9rem;
+      border-top: 1px solid #444;
+      margin-top: auto;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📷 Your Smile Gallery</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="/gallery">Gallery</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="glass-card">
+      <h2 style="text-align:center;">Captured Moments</h2>
+      <div id="gallery" class="gallery-grid">Loading...</div>
+      <div style="text-align: center;">
+        <a href="index.html" class="btn-glow">Back to Booth</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Smile Capture Booth — Keep Smiling 😄</p>
+  </footer>
+
+  <script>
+    function loadGallery() {
+      fetch("/get_images")
+        .then(res => res.json())
+        .then(data => {
+          const gallery = document.getElementById("gallery");
+          gallery.innerHTML = "";
+          if (!data.images.length) {
+            gallery.innerHTML = "<p style='text-align:center;'>No images found yet.</p>";
+            return;
+          }
+          data.images.forEach(img => {
+            const imageEl = document.createElement("img");
+            imageEl.src = "/static/images/" + img;
+            gallery.appendChild(imageEl);
+          });
+        })
+        .catch(err => {
+          console.error("Gallery load error:", err);
+          document.getElementById("gallery").innerHTML = "<p style='text-align:center;'>Error loading gallery.</p>";
+        });
+    }
+
+    window.onload = loadGallery;
+  </script>
+</body>
+</html>
