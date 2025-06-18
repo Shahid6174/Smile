@@ -1,0 +1,10 @@
+services:
+  smile-web:
+    build: .
+    container_name: smile-web
+    command: python app.py
+    volumes:
+      - .:/app
+    ports:
+      - 5000:5000
+      

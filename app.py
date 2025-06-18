@@ -1,12 +1,13 @@
-from flask import Flask, render_template, request, jsonify, send_file
-import cv2
-import os
-import time
-import random
 import base64
-import numpy as np
+import os
+import random
+import time
 import zipfile
 from io import BytesIO
+
+import cv2
+import numpy as np
+from flask import Flask, jsonify, render_template, request, send_file
 
 app = Flask(__name__)
 
@@ -57,6 +58,8 @@ def process_frame():
     npimg = np.frombuffer(img_bytes, np.uint8)
     img = cv2.imdecode(npimg, cv2.IMREAD_COLOR) # Decode to OpenCV image format
 
+    threshold = float(request.json.get('threshold', 50)) / 100  # Convert percentage to decimal
+    
     if img is None:
         return jsonify({
             'images_captured': images_captured,
@@ -107,11 +110,14 @@ def process_frame():
                 continue # Skip if ROI is invalid
 
             try:
+                # Smile detection with parameters scaled by threshold
+                # Lower threshold = more sensitive (catches subtle smiles)
+                # Higher threshold = less sensitive (requires clear smiles)
                 smiles = smileCascade.detectMultiScale(
                     roi_gray,
-                    scaleFactor=1.2, # Reduced from 1.8, more sensitive to smaller smiles
-                    minNeighbors=8,  # Reduced from 22, more lenient smile detection
-                    minSize=(30, 30), # Increased minSize slightly, but still reasonable
+                    scaleFactor=1.1,  # Keep constant as it affects the image pyramid
+                    minNeighbors=int(35 - threshold * 25),  # Range: 10 (sensitive) to 35 (strict)
+                    minSize=(int(25 * (1 - threshold * 0.4)), int(15 * (1 - threshold * 0.4))),  # Smaller size for lower threshold
                     flags=cv2.CASCADE_SCALE_IMAGE
                 )
             except Exception as e:
