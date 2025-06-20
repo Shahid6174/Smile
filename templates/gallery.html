@@ -107,6 +107,38 @@
         header, footer {
             background: linear-gradient(135deg, #4a90e2, #9013fe); /* Gradient for header and footer */
         }
+
+        .edit-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            color: #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-btn:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        .download-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -131,9 +163,13 @@
                 <div class="gallery-id">ID: {{ entry.id }}</div>
                 <div class="gallery-images-row">
                     {% for img in entry.images %}
-                    <img src="{{ img }}" alt="Smile Image" />
+                    <div style="position:relative; display:inline-block;">
+                        <img src="{{ img }}" alt="Smile Image" />
+                        <button onclick="editImage('{{ entry.id }}', '{{ img }}')" class="edit-btn">Edit</button>
+                    </div>
                     {% endfor %}
                 </div>
+                <a href="/download_images?id={{ entry.id }}" class="download-btn">Download Session</a>
             </div>
             {% endfor %}
         </div>
@@ -147,8 +183,95 @@
 
     <footer class="footer-gradient text-white p-4 text-center shadow-inner mt-auto">
       <p>&copy; 2025 Smile Capture Booth. All rights reserved.</p>
-      <p class="text-sm">Made with ❤️ for your perfect smile.</p>
+      <p class="text-sm">Made with ❤ for your perfect smile.</p>
     </footer>
 
+    <!-- Add this modal for editing images -->
+    <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000;">
+        <div style="background:#fff; padding:20px; border-radius:10px; position:relative;">
+            <span style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5em;" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Image</h2>
+            <canvas id="editCanvas" width="400" height="400" style="border:1px solid #ccc;"></canvas>
+            <div style="margin-top:10px;">
+                <button onclick="rotateImage()">Rotate</button>
+                <button onclick="applyGrayscale()">Grayscale</button>
+                <button onclick="saveEditedImage()">Save</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    let currentEditSession = null;
+    let currentEditImage = null;
+    let originalImageData = null;
+
+    function editImage(sessionId, imgPath) {
+        currentEditSession = sessionId;
+        currentEditImage = imgPath;
+        const modal = document.getElementById('editModal');
+        const canvas = document.getElementById('editCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = function() {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        };
+        img.src = imgPath;
+        modal.style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    function rotateImage() {
+        const canvas = document.getElementById('editCanvas');
+        const ctx = canvas.getContext('2d');
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.height;
+        tempCanvas.height = canvas.width;
+        tempCanvas.getContext('2d').translate(canvas.height / 2, canvas.width / 2);
+        tempCanvas.getContext('2d').rotate(Math.PI / 2);
+        tempCanvas.getContext('2d').drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+        canvas.width = tempCanvas.width;
+        canvas.height = tempCanvas.height;
+        ctx.drawImage(tempCanvas, 0, 0);
+    }
+
+    function applyGrayscale() {
+        const canvas = document.getElementById('editCanvas');
+        const ctx = canvas.getContext('2d');
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        let data = imageData.data;
+        for(let i = 0; i < data.length; i += 4) {
+            let avg = (data[i] + data[i+1] + data[i+2]) / 3;
+            data[i] = data[i+1] = data[i+2] = avg;
+        }
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+    function saveEditedImage() {
+        const canvas = document.getElementById('editCanvas');
+        const dataURL = canvas.toDataURL('image/jpeg');
+        fetch('/edit_image', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                session_id: currentEditSession,
+                image_path: currentEditImage,
+                image_data: dataURL
+            })
+        }).then(res => res.json()).then(data => {
+            if(data.success) {
+                closeEditModal();
+                location.reload();
+            } else {
+                alert('Failed to save image');
+            }
+        });
+    }
+    </script>
 </body>
 </html>
