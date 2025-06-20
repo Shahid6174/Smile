@@ -230,6 +230,25 @@ def gallery():
 
     return render_template('gallery.html', gallery=gallery_data)
 
+@app.route('/edit_image', methods=['POST'])
+def edit_image():
+    data = request.get_json()
+    session_id = data['session_id']
+    image_path = data['image_path']
+    image_data = data['image_data']
+
+    # Extract the filename from the image path
+    filename = os.path.basename(image_path)
+    folder_path = os.path.join('static', 'images', session_id)
+    if not os.path.exists(folder_path):
+        return jsonify({'success': False, 'error': 'Session not found'})
+
+    img_bytes = base64.b64decode(image_data.split(',')[1])
+    img_file_path = os.path.join(folder_path, filename)
+    with open(img_file_path, 'wb') as f:
+        f.write(img_bytes)
+    return jsonify({'success': True})
+
 
 # Initialize global variables for the first run or if not set by Flask
 # (This part is often better handled with Flask's app context or Blueprint setup for larger apps)
@@ -241,4 +260,3 @@ if __name__ == '__main__':
     os.makedirs("static/images", exist_ok=True)
 
     app.run(debug=True, host="0.0.0.0", port=5000)
-
