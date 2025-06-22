@@ -123,6 +123,34 @@
           ></canvas>
         </div>
 
+        <div class="threshold-container mt-6">
+          <div class="flex justify-between text-sm mb-1 text-gray-700">
+            <span>Smile Sensitivity</span>
+            <span id="threshold-value">50%</span>
+          </div>
+          <input 
+            type="range" 
+            id="smile-threshold" 
+            min="0" 
+            max="100" 
+            value="50"
+            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          >
+          <div class="flex justify-between text-xs mt-1 text-gray-500">
+            <span>Less Sensitive</span>
+            <span>More Sensitive</span>
+          </div>
+        </div>
+
+        <div class="button-container flex justify-center mb-6">
+          <button id="startCaptureBtn" class="button-primary text-white py-3 px-8 rounded-lg text-lg font-semibold shadow-md transition duration-300 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            Start Capture
+          </button>
+        </div>
+
         <div class="progress-container mb-6">
           <div class="progress-labels flex justify-between text-sm mb-1 text-gray-700">
             <span>Images Captured</span><span id="progress-text">0/3</span>
@@ -183,7 +211,6 @@
           video.srcObject = stream;
           video.onloadedmetadata = () => {
             video.play();
-            captureLoop();
           };
           updateStatus("Camera ready. Smile to capture!");
         } catch (err) {
@@ -221,6 +248,13 @@
         }
       }
 
+        document.getElementById('startCaptureBtn').addEventListener('click', function() {
+            this.style.display = "none";
+            capturing = true;
+            captureLoop();
+            updateStatus("Capture started! Smile when ready.");
+        });
+
       function captureLoop() {
         if (!capturing || imagesCaptured >= totalImages) {
           updateStatus("Session complete!");
@@ -234,7 +268,10 @@
         fetch("/process_frame", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ image: dataURL }),
+          body: JSON.stringify({ 
+            image: dataURL,
+            threshold: document.getElementById('smile-threshold').value 
+          }),
         })
           .then((res) => res.json())
           .then((data) => {
